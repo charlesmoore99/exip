@@ -1903,7 +1903,10 @@ static errorCode getRestrictionSimpleProtoGrammar(BuildContext* ctx, QualifiedTr
 			}
 			else if(enumEntry->element == ELEMENT_ENUMERATION)
 			{
-				if(enumIter >= eDef.count) { fprintf(stderr, "ENUM2 OVERFLOW enumIter=%u count=%u\n", enumIter, (unsigned)eDef.count); return EXIP_UNEXPECTED_ERROR; }
+				if(enumIter >= eDef.count) 
+				{ 
+					return EXIP_UNEXPECTED_ERROR; 
+				}
 				switch(GET_EXI_TYPE(ctx->schema->simpleTypeTable.sType[typeId].content))
 				{
 					case VALUE_TYPE_STRING:
