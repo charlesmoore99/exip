@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 
 	if(strstr(argv[argIndex], "-schema") != NULL)
 	{
-		char *xsdList = argv[argIndex] + 7;
+		char *xsdList = argv[argIndex] + 8;
 
 		parseSchema(xsdList, &schema, mask, maskOpt);
 
@@ -253,7 +253,7 @@ static void parseSchema(char* xsdList, EXIPSchema* schema, unsigned char mask, E
 	errorCode tmp_err_code = EXIP_UNEXPECTED_ERROR;
 	FILE *schemaFile;
 	BinaryBuffer buffer[MAX_XSD_FILES_COUNT]; // up to 10 XSD files
-	char schemaFileName[50];
+	char schemaFileName[2048];
 	unsigned int schemaFilesCount = 0;
 	unsigned int i;
 	char *token;

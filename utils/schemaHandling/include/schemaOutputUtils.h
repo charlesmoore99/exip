@@ -21,7 +21,7 @@
 #include "createGrammars.h"
 
 // Maximum number of characters in a variable name buffer
-#define VAR_BUFFER_MAX_LENGTH 200
+#define VAR_BUFFER_MAX_LENGTH 2048
 
 typedef struct
 {

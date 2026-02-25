@@ -636,6 +636,10 @@ static errorCode handleElementEl(BuildContext* ctx, QualifiedTreeTableEntry* tre
 			{
 				TRY(getComplexTypeProtoGrammar(ctx, &treeTEntry->entry->child, &pg));
 			}
+			else if(treeTEntry->entry->child.entry->element == ELEMENT_ANNOTATION)
+			{
+    				// Annotations carry no grammar information - skip
+			}			
 			else
 				return EXIP_UNEXPECTED_ERROR;
 
@@ -1398,8 +1402,10 @@ static errorCode getSequenceProtoGrammar(BuildContext* ctx, QualifiedTreeTableEn
 			TRY(getAnyProtoGrammar(ctx, &nextIterator, &particleGrammar));
 		}
 		else
+		{
+			destroyDynArray(&partGrammarTbl.dynArray);
 			return EXIP_UNEXPECTED_ERROR;
-
+		}
 		TRY(addDynEntry(&partGrammarTbl.dynArray, &particleGrammar, &dummyTblIndx));
 		nextIterator.entry = nextIterator.entry->next;
 	}
@@ -1775,16 +1781,19 @@ static errorCode getRestrictionSimpleProtoGrammar(BuildContext* ctx, QualifiedTr
 			// TODO: needs to be implemented. It is also needed for the XML Schema grammars
 			// COMMENT #SCHEMA#: ignore for now
 			DEBUG_MSG(INFO, DEBUG_GRAMMAR_GEN, ("\n>Type facet pattern is not implemented: at %s, line %d.", __FILE__, __LINE__));
-//			return EXIP_NOT_IMPLEMENTED_YET;
 		}
 		else if(tmpEntry->element == ELEMENT_WHITE_SPACE)
 		{
-			SET_TYPE_FACET(newSimpleType.content, TYPE_FACET_WHITE_SPACE);
-			return EXIP_NOT_IMPLEMENTED_YET;
+			// skip whiteSpace
+			// whiteSpace facet is informational only - no grammar impact
 		}
 		else if(tmpEntry->element == ELEMENT_ENUMERATION)
 		{
 			enumCount += 1;
+		}
+		else if(tmpEntry->element == ELEMENT_ANNOTATION)
+		{
+			// skip annotations
 		}
 		else
 			return EXIP_UNEXPECTED_ERROR;
@@ -1888,8 +1897,13 @@ static errorCode getRestrictionSimpleProtoGrammar(BuildContext* ctx, QualifiedTr
 		enumEntry = resEntry->entry->child.entry;
 		while(enumEntry != NULL)
 		{
-			if(enumEntry->element == ELEMENT_ENUMERATION)
+			if(enumEntry->element == ELEMENT_ANNOTATION)
 			{
+				// skip annotations
+			}
+			else if(enumEntry->element == ELEMENT_ENUMERATION)
+			{
+				if(enumIter >= eDef.count) { fprintf(stderr, "ENUM2 OVERFLOW enumIter=%u count=%u\n", enumIter, (unsigned)eDef.count); return EXIP_UNEXPECTED_ERROR; }
 				switch(GET_EXI_TYPE(ctx->schema->simpleTypeTable.sType[typeId].content))
 				{
 					case VALUE_TYPE_STRING:
@@ -1935,9 +1949,9 @@ static errorCode getRestrictionSimpleProtoGrammar(BuildContext* ctx, QualifiedTr
 					default:
 						return EXIP_NOT_IMPLEMENTED_YET;
 				}
+				enumIter++;
 			}
 			enumEntry = enumEntry->next;
-			enumIter++;
 		}
 
 		TRY(addDynEntry(&ctx->schema->enumTable.dynArray, &eDef, &elId));

@@ -65,8 +65,11 @@ void staticStringDefOutput(String* str, char* varName, FILE* out)
 			if(charIter < charMax - 1)
 				fprintf(out, ", ");
 		}
-		strncpy(displayStr, str->str, str->length);
-		displayStr[str->length] = '\0';
+		{ 
+			size_t cpyLen = str->length < (VAR_BUFFER_MAX_LENGTH-1) ? str->length : (VAR_BUFFER_MAX_LENGTH-1); 
+			strncpy(displayStr, str->str, cpyLen); 
+			displayStr[cpyLen] = '\0'; 
+		}
 		fprintf(out, "}; /* %s */\n", displayStr);
 	}
 }
@@ -232,8 +235,8 @@ void staticPrefixOutput(PfxTable* pfxTbl, char* prefix, Index uriId, Deviations 
 void staticLnEntriesOutput(LnTable* lnTbl, char* prefix, Index uriId, Deviations dvis, FILE* out)
 {
 	Index lnIter;
-	char elemGrammar[20];
-	char typeGrammar[20];
+	char elemGrammar[256];
+	char typeGrammar[256];
 
 	if(lnTbl->count + dvis.ln> 0)
 	{
